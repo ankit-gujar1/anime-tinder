@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { getName } from "./utils/names";
-import { saveAs } from 'file-saver'
+import { saveAs } from 'file-saver';
+import debounce from 'lodash/debounce';
 
 // https://i.waifu.pics/II9WeHB.png
 // https://i.waifu.pics/CNzs4Pd.jpg
@@ -29,23 +30,18 @@ function App() {
 
   }, [n, api, arrow]);
 
+  const handleKeyDown = useCallback(debounce((e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') setArrow(prevArrow => prevArrow + 1);
+    else if (e.key === 'ArrowUp') setApi('https://api.waifu.pics/nsfw/waifu');
+    else if (e.key === 'ArrowDown') setApi('https://api.waifu.pics/sfw/waifu');
+  }, 300), []);
+
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        setArrow(prevArrow => prevArrow + 1);
-      } else if (e.key === 'ArrowUp') {
-        setApi('https://api.waifu.pics/nsfw/waifu');
-      } else if (e.key === 'ArrowDown') {
-        setApi('https://api.waifu.pics/sfw/waifu');
-      }
-    };
-  
     document.addEventListener('keydown', handleKeyDown);
-  
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   console.log('arrow',arrow);
 
